@@ -42,6 +42,7 @@ static void testApply(rbusFilter_t f1)
     rbusValue_Release(vIn);
 }
 
+
 static void testSerialize(rbusFilter_t f1)
 {
     rbusFilter_t f2;
@@ -52,6 +53,7 @@ static void testSerialize(rbusFilter_t f1)
     rbusFilter_Encode(f1, buffOut);
     file = fopen("/tmp/filter.dat", "wb");
     if(!file)
+// Condition "!file", taking false branch.
     {
         TEST(file != NULL);
         return;
@@ -60,10 +62,16 @@ static void testSerialize(rbusFilter_t f1)
     fclose(file);
 
     rbusBuffer_Create(&buffIn);
+// "rbusBuffer_Create" allocates memory that is stored into "buffIn".
     file = fopen("/tmp/filter.dat", "rb");
     if(!file)
+// Condition "!file", taking true branch.
     {
         TEST(file != NULL);
+// Condition "!(file != NULL)", taking true branch.
+// Falling through to end of if statement.
+// Condition "!(file != NULL)", taking true branch.
+        rbusBuffer_Destroy(buffIn);
         return;
     }
     fseek(file, 0, SEEK_END);
@@ -90,7 +98,6 @@ static void testSerialize(rbusFilter_t f1)
     rbusBuffer_Destroy(buffOut);
     rbusBuffer_Destroy(buffIn);
 }
-
 /*
     f1( j1( r1(>10) | r2(<-10) ) | j2( r3(>-5) && r4(<5) ) )
     this filter will trigger if the test value as such
@@ -146,4 +153,3 @@ void testFilter(rbusHandle_t handle, int* countPass, int* countFail)
     *countFail = gCountFail;
     PRINT_TEST_RESULTS("test_Filter");
 }
-
